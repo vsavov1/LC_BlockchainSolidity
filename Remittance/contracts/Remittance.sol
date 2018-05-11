@@ -22,7 +22,8 @@ contract Remittance {
     {
         require(password != 0);
         require(msg.value > 0);
-
+        require(orders[password].pass == bytes32(0x0));
+        
         orders[password] = Order({
             owner: msg.sender,
             recipient: recipient,
@@ -37,7 +38,10 @@ contract Remittance {
     {
         bytes32 key = keccak256(emailPassword, smsPassword);
         Order storage order = orders[key];
+        
         require(key == order.pass);
+        require(order.recipient == msg.sender);
+        
         recipient.transfer(order.amount);
         localCurrencyBalances[order.recipient] += order.amount / tokenExchangeRate;
         delete orders[key];
@@ -45,10 +49,6 @@ contract Remittance {
         return true;
     }
     
-    function getLocalCurrencyByAddress(address addr) view returns (uint256){
-        return localCurrencyBalances[addr];
-    }
-     
     function cancelRemittance(bytes32 password) public returns (bool)
     {
         Order storage order = orders[password];

@@ -12,20 +12,17 @@ contract Splitter {
     }
     
     function split() payable public returns(bool){
-        if(msg.value <= 1 ) return false;
+        require(msg.value >= 2 );
+        
+        if(msg.value % 2 != 0)
+        {
+            msg.sender.transfer(1);
+        }
         
         _bob.transfer(msg.value / 2);
         _carol.transfer(msg.value / 2);
         
         return true;
-    }
-
-    function getBobBalance() constant returns (uint) {
-        return _bob.balance;
-    }
-    
-    function getAliceBalance() constant returns (uint) {
-        return _carol.balance;
     }
     
     function termiante() public {
